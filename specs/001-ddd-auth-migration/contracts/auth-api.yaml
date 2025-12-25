@@ -1,0 +1,410 @@
+openapi: 3.0.3
+info:
+  title: Auth Service API
+  description: |
+    Authentication and Authorization API for op-stack-auth service.
+    Provides user registration, login, logout, and token management.
+  version: 1.0.0
+  contact:
+    name: op-stack Team
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development server
+
+tags:
+  - name: Authentication
+    description: Login, logout, and token operations
+  - name: Registration
+    description: User registration
+  - name: User
+    description: User profile operations (authenticated)
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Registration
+      summary: Register a new user
+      description: Creates a new user account with the provided credentials
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                passwordPolicy:
+                  summary: Password policy violation
+                  value:
+                    code: AUTH_008
+                    message: Password must be at least 8 characters with uppercase, lowercase, and digit
+                    timestamp: '2025-12-25T10:00:00Z'
+        '409':
+          description: Username or email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                emailExists:
+                  summary: Email already registered
+                  value:
+                    code: AUTH_006
+                    message: Email already exists
+                    timestamp: '2025-12-25T10:00:00Z'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate user
+      description: |
+        Authenticates a user with username/email and password.
+        Returns JWT token on success.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidCredentials:
+                  summary: Wrong username/password
+                  value:
+                    code: AUTH_001
+                    message: Invalid credentials
+                    timestamp: '2025-12-25T10:00:00Z'
+        '423':
+          description: Account locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                accountLocked:
+                  summary: Account temporarily locked
+                  value:
+                    code: AUTH_002
+                    message: Account is locked. Please try again in 15 minutes.
+                    timestamp: '2025-12-25T10:00:00Z'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout user
+      description: Invalidates the current access token
+      operationId: logout
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: |
+        Exchanges a valid (non-expired) token for a new one.
+        Useful for extending sessions without re-authentication.
+      operationId: refreshToken
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: Token expired or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/me:
+    get:
+      tags:
+        - User
+      summary: Get current user profile
+      description: Returns the profile of the authenticated user
+      operationId: getCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/validate:
+    post:
+      tags:
+        - Authentication
+      summary: Validate token
+      description: |
+        Validates an access token and returns user info if valid.
+        Used by other services for authentication verification.
+      operationId: validateToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateTokenRequest'
+      responses:
+        '200':
+          description: Token is valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenValidationResponse'
+        '401':
+          description: Token is invalid or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /auth/login
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 32
+          pattern: '^[a-zA-Z0-9_]+$'
+          description: Alphanumeric username with underscores allowed
+          example: john_doe
+        email:
+          type: string
+          format: email
+          description: Valid email address
+          example: john.doe@example.com
+        password:
+          type: string
+          minLength: 8
+          description: Password (min 8 chars, must include uppercase, lowercase, digit)
+          example: SecurePass123
+
+    RegisterResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: User ID
+          example: 1
+        username:
+          type: string
+          example: john_doe
+        email:
+          type: string
+          example: john.doe@example.com
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-12-25T10:00:00Z'
+
+    LoginRequest:
+      type: object
+      required:
+        - identifier
+        - password
+      properties:
+        identifier:
+          type: string
+          description: Username or email
+          example: john_doe
+        password:
+          type: string
+          description: User password
+          example: SecurePass123
+        rememberMe:
+          type: boolean
+          default: false
+          description: If true, token expires in 30 days; otherwise 1 hour
+          example: false
+
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT access token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        tokenType:
+          type: string
+          default: Bearer
+          example: Bearer
+        expiresIn:
+          type: integer
+          description: Token validity in seconds
+          example: 3600
+        user:
+          $ref: '#/components/schemas/UserProfileResponse'
+
+    TokenResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: New JWT access token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        tokenType:
+          type: string
+          default: Bearer
+        expiresIn:
+          type: integer
+          description: Token validity in seconds
+          example: 3600
+
+    UserProfileResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        username:
+          type: string
+          example: john_doe
+        email:
+          type: string
+          example: john.doe@example.com
+        roles:
+          type: array
+          items:
+            type: string
+          example: ['USER']
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-12-25T10:00:00Z'
+
+    ValidateTokenRequest:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          description: JWT token to validate
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    TokenValidationResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          example: true
+        userId:
+          type: integer
+          format: int64
+          example: 1
+        username:
+          type: string
+          example: john_doe
+        roles:
+          type: array
+          items:
+            type: string
+          example: ['USER']
+        expiresAt:
+          type: string
+          format: date-time
+          example: '2025-12-25T11:00:00Z'
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Operation completed successfully
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code for client handling
+          example: AUTH_001
+        message:
+          type: string
+          description: Human-readable error message
+          example: Invalid credentials
+        timestamp:
+          type: string
+          format: date-time
+          example: '2025-12-25T10:00:00Z'
+        traceId:
+          type: string
+          description: Request trace ID for debugging
+          example: abc123def456
