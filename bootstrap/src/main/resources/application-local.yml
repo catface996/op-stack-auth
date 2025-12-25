@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/auth_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+# Local JWT secret - use a strong secret in production
+auth:
+  jwt:
+    secret: local-dev-secret-key-for-testing-purposes-only-change-in-prod-env
+
+logging:
+  level:
+    com.catface996.auth: DEBUG
+    org.springframework.security: DEBUG
+    com.alibaba.druid: DEBUG

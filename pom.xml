@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.catface996.auth</groupId>
+    <artifactId>auth-service</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Auth Service</name>
+    <description>Auth Service - DDD Multi-Module Project for Authentication</description>
+
+    <modules>
+        <module>common</module>
+        <module>infrastructure</module>
+        <module>domain</module>
+        <module>application</module>
+        <module>interface</module>
+        <module>bootstrap</module>
+    </modules>
+
+    <properties>
+        <!-- Java Version -->
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+
+        <!-- Project Encoding -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Spring Framework -->
+        <spring-boot.version>3.4.1</spring-boot.version>
+
+        <!-- Database & ORM -->
+        <mybatis-plus.version>3.5.7</mybatis-plus.version>
+        <druid.version>1.2.20</druid.version>
+
+        <!-- Observability -->
+        <micrometer-tracing.version>1.3.5</micrometer-tracing.version>
+        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+
+        <!-- Security & JWT -->
+        <jjwt.version>0.12.6</jjwt.version>
+
+        <!-- Internal modules -->
+        <auth-service.version>1.0.0-SNAPSHOT</auth-service.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Boot BOM -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Micrometer Tracing BOM -->
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-tracing-bom</artifactId>
+                <version>${micrometer-tracing.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- MyBatis-Plus Spring Boot 3 Starter -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <!-- Druid Spring Boot 3 Starter -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-3-starter</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+
+            <!-- Logstash Logback Encoder -->
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash-logback-encoder.version}</version>
+            </dependency>
+
+            <!-- JWT Dependencies -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${jjwt.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <!-- Internal Modules -->
+            <dependency>
+                <groupId>com.catface996.auth</groupId>
+                <artifactId>common</artifactId>
+                <version>${auth-service.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.catface996.auth</groupId>
+                <artifactId>domain-model</artifactId>
+                <version>${auth-service.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.catface996.auth</groupId>
+                <artifactId>domain-api</artifactId>
+                <version>${auth-service.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.catface996.auth</groupId>
+                <artifactId>domain-impl</artifactId>
+                <version>${auth-service.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.catface996.auth</groupId>
+                <artifactId>repository-api</artifactId>
+                <version>${auth-service.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.catface996.auth</groupId>
+                <artifactId>security-api</artifactId>
+                <version>${auth-service.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.catface996.auth</groupId>
+                <artifactId>application-api</artifactId>
+                <version>${auth-service.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.catface996.auth</groupId>
+                <artifactId>application-impl</artifactId>
+                <version>${auth-service.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.catface996.auth</groupId>
+                <artifactId>mysql-impl</artifactId>
+                <version>${auth-service.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.catface996.auth</groupId>
+                <artifactId>jwt-impl</artifactId>
+                <version>${auth-service.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.catface996.auth</groupId>
+                <artifactId>interface-http</artifactId>
+                <version>${auth-service.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Spring Boot Maven Plugin -->
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
+                </plugin>
+
+                <!-- Maven Compiler Plugin -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <parameters>true</parameters>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>1.18.36</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+
+                <!-- JaCoCo Code Coverage Plugin -->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.12</version>
+                    <executions>
+                        <execution>
+                            <id>prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <!-- JaCoCo Plugin for all modules -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
