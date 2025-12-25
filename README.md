@@ -1,96 +1,96 @@
 # OP-Stack Auth Service
 
-基于 DDD（领域驱动设计）架构的认证授权服务，提供用户注册、登录、JWT Token 认证和 RBAC 权限控制功能。
+A DDD (Domain-Driven Design) based authentication and authorization service providing user registration, login, JWT token authentication, and RBAC access control.
 
-## 技术栈
+## Tech Stack
 
-| 技术 | 版本 | 说明 |
-|------|------|------|
-| Java | 21 | LTS 版本 |
-| Spring Boot | 3.4.1 | 基础框架 |
-| Spring Security | 6.x | 安全框架 |
-| MyBatis-Plus | 3.5.7 | ORM 框架 |
-| JJWT | 0.12.6 | JWT Token 处理 |
-| MySQL | 8.0 | 数据库 |
-| Druid | 1.2.20 | 数据库连接池 |
+| Technology | Version | Description |
+|------------|---------|-------------|
+| Java | 21 | LTS Version |
+| Spring Boot | 3.4.1 | Base Framework |
+| Spring Security | 6.x | Security Framework |
+| MyBatis-Plus | 3.5.7 | ORM Framework |
+| JJWT | 0.12.6 | JWT Token Processing |
+| MySQL | 8.0 | Database |
+| Druid | 1.2.20 | Connection Pool |
 
-## 项目结构
+## Project Structure
 
 ```
 op-stack-auth/
-├── common/                          # 公共模块
+├── common/                          # Common module
 │   └── src/main/java/.../common/
-│       ├── exception/               # 异常定义
-│       └── result/                  # 统一返回结果
-├── domain/                          # 领域层
-│   ├── domain-model/                # 领域模型
+│       ├── exception/               # Exception definitions
+│       └── result/                  # Unified response
+├── domain/                          # Domain layer
+│   ├── domain-model/                # Domain models
 │   │   └── src/main/java/.../model/
-│   │       ├── user/                # 用户聚合根
-│   │       ├── role/                # 角色实体
-│   │       └── session/             # Token 值对象
-│   ├── domain-api/                  # 领域服务接口
-│   ├── domain-impl/                 # 领域服务实现
-│   ├── repository-api/              # 仓储接口
-│   └── security-api/                # 安全接口
-├── application/                     # 应用层
-│   ├── application-api/             # 应用服务接口
-│   └── application-impl/            # 应用服务实现
-├── infrastructure/                  # 基础设施层
+│   │       ├── user/                # User aggregate root
+│   │       ├── role/                # Role entity
+│   │       └── session/             # Token value object
+│   ├── domain-api/                  # Domain service interfaces
+│   ├── domain-impl/                 # Domain service implementations
+│   ├── repository-api/              # Repository interfaces
+│   └── security-api/                # Security interfaces
+├── application/                     # Application layer
+│   ├── application-api/             # Application service interfaces
+│   └── application-impl/            # Application service implementations
+├── infrastructure/                  # Infrastructure layer
 │   ├── repository/
-│   │   └── mysql-impl/              # MySQL 仓储实现
+│   │   └── mysql-impl/              # MySQL repository implementation
 │   └── security/
-│       └── jwt-impl/                # JWT Token 实现
-├── interface/                       # 接口层
-│   └── interface-http/              # REST API 控制器
-└── bootstrap/                       # 启动模块
+│       └── jwt-impl/                # JWT token implementation
+├── interface/                       # Interface layer
+│   └── interface-http/              # REST API controllers
+└── bootstrap/                       # Bootstrap module
     └── src/main/
         ├── java/.../bootstrap/
-        │   ├── AuthApplication.java # 应用入口
-        │   └── config/              # 配置类
+        │   ├── AuthApplication.java # Application entry
+        │   └── config/              # Configuration classes
         └── resources/
-            ├── application.yml      # 配置文件
-            └── db/migration/        # 数据库脚本
+            ├── application.yml      # Configuration files
+            └── db/migration/        # Database scripts
 ```
 
-## 功能特性
+## Features
 
-### 用户认证
-- **用户注册**: 支持用户名、邮箱、密码注册，密码策略校验
-- **用户登录**: 支持用户名/邮箱登录，Remember-Me 功能
-- **Token 刷新**: 支持 Token 无感刷新
-- **用户登出**: Token 黑名单机制
+### Authentication
+- **User Registration**: Username, email, password registration with password policy validation
+- **User Login**: Username/email login with Remember-Me support
+- **Token Refresh**: Seamless token refresh
+- **User Logout**: Token blacklist mechanism
 
-### 安全特性
-- **JWT Token**: 无状态认证，支持 1 小时/30 天过期时间
-- **密码加密**: BCrypt 加密存储
-- **账户锁定**: 5 次失败后锁定 15 分钟，自动解锁
-- **登录审计**: 记录登录尝试（IP、User-Agent）
+### Security
+- **JWT Token**: Stateless authentication with 1 hour / 30 days expiration
+- **Password Encryption**: BCrypt hashing
+- **Account Lockout**: Lock after 5 failed attempts for 15 minutes, auto-unlock
+- **Login Audit**: Track login attempts (IP, User-Agent)
 
-### 权限控制
-- **RBAC**: 基于角色的访问控制
-- **预置角色**: USER（普通用户）、ADMIN（管理员）
-- **方法级权限**: 支持 @PreAuthorize 注解
+### Access Control
+- **RBAC**: Role-based access control
+- **Predefined Roles**: USER (standard user), ADMIN (administrator)
+- **Method-level Security**: @PreAuthorize annotation support
 
-## 快速开始
+## Quick Start
 
-### 环境要求
+### Prerequisites
 - JDK 21+
 - Maven 3.8+
 - MySQL 8.0+
 
-### 数据库初始化
+### Database Setup
 
 ```sql
--- 创建数据库
+-- Create database
 CREATE DATABASE auth_db DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- 执行初始化脚本
--- 脚本位置: bootstrap/src/main/resources/db/migration/V1__init_schema.sql
+-- Run initialization script
+-- Location: bootstrap/src/main/resources/db/migration/V1__init_schema.sql
 ```
 
-### 配置修改
+### Configuration
 
-编辑 `bootstrap/src/main/resources/application-local.yml`:
+Edit `bootstrap/src/main/resources/application-local.yml`:
 
 ```yaml
 spring:
@@ -100,43 +100,43 @@ spring:
     password: your_password
 ```
 
-### 构建运行
+### Build & Run
 
 ```bash
-# 构建项目
+# Build project
 mvn clean package -DskipTests
 
-# 启动服务
+# Run service
 mvn spring-boot:run -pl bootstrap
 
-# 或者直接运行 JAR
+# Or run JAR directly
 java -jar bootstrap/target/bootstrap-1.0.0-SNAPSHOT.jar
 ```
 
-服务默认运行在 `http://localhost:9090`
+Service runs at `http://localhost:9090` by default.
 
-## API 接口
+## API Endpoints
 
-### 认证接口
+### Authentication APIs
 
-| 方法 | 路径 | 说明 | 认证 |
-|------|------|------|------|
-| POST | `/api/v1/auth/register` | 用户注册 | 否 |
-| POST | `/api/v1/auth/login` | 用户登录 | 否 |
-| POST | `/api/v1/auth/logout` | 用户登出 | 是 |
-| POST | `/api/v1/auth/refresh` | 刷新 Token | 否 |
-| GET | `/api/v1/auth/me` | 获取当前用户 | 是 |
+| Method | Path | Description | Auth Required |
+|--------|------|-------------|---------------|
+| POST | `/api/v1/auth/register` | User registration | No |
+| POST | `/api/v1/auth/login` | User login | No |
+| POST | `/api/v1/auth/logout` | User logout | Yes |
+| POST | `/api/v1/auth/refresh` | Refresh token | No |
+| GET | `/api/v1/auth/me` | Get current user | Yes |
 
-### 管理接口
+### Admin APIs
 
-| 方法 | 路径 | 说明 | 权限 |
-|------|------|------|------|
-| GET | `/api/v1/admin/dashboard` | 管理面板 | ADMIN |
-| GET | `/api/v1/admin/stats` | 系统统计 | ADMIN |
+| Method | Path | Description | Role |
+|--------|------|-------------|------|
+| GET | `/api/v1/admin/dashboard` | Admin dashboard | ADMIN |
+| GET | `/api/v1/admin/stats` | System statistics | ADMIN |
 
-### 接口示例
+### API Examples
 
-#### 注册用户
+#### Register User
 ```bash
 curl -X POST http://localhost:9090/api/v1/auth/register \
   -H "Content-Type: application/json" \
@@ -147,7 +147,7 @@ curl -X POST http://localhost:9090/api/v1/auth/register \
   }'
 ```
 
-#### 用户登录
+#### User Login
 ```bash
 curl -X POST http://localhost:9090/api/v1/auth/login \
   -H "Content-Type: application/json" \
@@ -158,75 +158,75 @@ curl -X POST http://localhost:9090/api/v1/auth/login \
   }'
 ```
 
-#### 获取当前用户
+#### Get Current User
 ```bash
 curl -X GET http://localhost:9090/api/v1/auth/me \
   -H "Authorization: Bearer <your_token>"
 ```
 
-## 配置说明
+## Configuration Reference
 
-### JWT 配置
+### JWT Configuration
 
 ```yaml
 auth:
   jwt:
-    secret: your-256-bit-secret-key    # JWT 签名密钥
-    expiration-seconds: 3600            # Token 过期时间（1小时）
-    remember-me-expiration-seconds: 2592000  # Remember-Me 过期时间（30天）
-    issuer: op-stack-auth               # Token 签发者
+    secret: your-256-bit-secret-key         # JWT signing key
+    expiration-seconds: 3600                 # Token expiration (1 hour)
+    remember-me-expiration-seconds: 2592000  # Remember-Me expiration (30 days)
+    issuer: op-stack-auth                    # Token issuer
   security:
-    max-failed-attempts: 5              # 最大失败尝试次数
-    lockout-duration-minutes: 15        # 锁定时长（分钟）
+    max-failed-attempts: 5                   # Max failed login attempts
+    lockout-duration-minutes: 15             # Lockout duration (minutes)
 ```
 
-### 数据库表结构
+### Database Tables
 
-| 表名 | 说明 |
-|------|------|
-| users | 用户表 |
-| roles | 角色表 |
-| user_roles | 用户角色关联表 |
-| login_attempts | 登录尝试记录表 |
+| Table | Description |
+|-------|-------------|
+| users | User information |
+| roles | Role definitions |
+| user_roles | User-role associations |
+| login_attempts | Login attempt records |
 
-## 错误码
+## Error Codes
 
-| 错误码 | 说明 |
-|--------|------|
-| AUTH_001 | 无效的凭证 |
-| AUTH_002 | 账户已锁定 |
-| AUTH_003 | Token 已过期 |
-| AUTH_004 | 无效的 Token |
-| AUTH_005 | 访问被拒绝 |
-| AUTH_006 | 权限不足 |
-| AUTH_007 | 用户名已存在 |
-| AUTH_008 | 邮箱已存在 |
-| AUTH_009 | 账户未激活 |
-| AUTH_010 | 需要认证 |
+| Code | Description |
+|------|-------------|
+| AUTH_001 | Invalid credentials |
+| AUTH_002 | Account locked |
+| AUTH_003 | Token expired |
+| AUTH_004 | Invalid token |
+| AUTH_005 | Access denied |
+| AUTH_006 | Insufficient permissions |
+| AUTH_007 | Username already exists |
+| AUTH_008 | Email already exists |
+| AUTH_009 | Account inactive |
+| AUTH_010 | Authentication required |
 
-## 开发指南
+## Development Guide
 
-### 添加新的 API 端点
+### Adding New API Endpoints
 
-1. 在 `application-api` 中定义 Command/Query
-2. 在 `application-impl` 中实现应用服务
-3. 在 `interface-http` 中创建 Controller 和 DTO
-4. 在 `SecurityConfig` 中配置访问权限
+1. Define Command/Query in `application-api`
+2. Implement application service in `application-impl`
+3. Create Controller and DTOs in `interface-http`
+4. Configure access rules in `SecurityConfig`
 
-### 添加新的领域服务
+### Adding New Domain Services
 
-1. 在 `domain-api` 中定义接口
-2. 在 `domain-impl` 中实现服务
-3. 在 `repository-api` 中定义仓储接口（如需要）
-4. 在 `mysql-impl` 中实现仓储
+1. Define interface in `domain-api`
+2. Implement service in `domain-impl`
+3. Define repository interface in `repository-api` (if needed)
+4. Implement repository in `mysql-impl`
 
-## 监控端点
+## Monitoring Endpoints
 
-| 端点 | 说明 |
-|------|------|
-| `/actuator/health` | 健康检查 |
-| `/actuator/info` | 应用信息 |
-| `/actuator/metrics` | 指标数据 |
+| Endpoint | Description |
+|----------|-------------|
+| `/actuator/health` | Health check |
+| `/actuator/info` | Application info |
+| `/actuator/metrics` | Metrics data |
 
 ## License
 
