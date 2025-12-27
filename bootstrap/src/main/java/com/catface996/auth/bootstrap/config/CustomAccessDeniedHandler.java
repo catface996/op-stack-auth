@@ -34,7 +34,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         log.warn("Access denied for request to {}: {}",
                 request.getRequestURI(), accessDeniedException.getMessage());
 
-        Result<Void> result = Result.failure(ErrorCode.AUTH_006, "Access denied: insufficient permissions");
+        Result<Void> result = Result.failure(ErrorCode.ACCESS_DENIED);
 
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

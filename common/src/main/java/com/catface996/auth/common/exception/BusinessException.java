@@ -4,16 +4,17 @@ import com.catface996.auth.common.result.ErrorCode;
 import lombok.Getter;
 
 /**
- * Base exception for business logic errors
+ * 业务异常基类
+ * 所有业务逻辑异常应继承此类
  */
 @Getter
 public class BusinessException extends RuntimeException {
 
-    private final String code;
+    private final int code;
     private final String errorMessage;
     private final ErrorCode errorCode;
 
-    public BusinessException(String code, String message) {
+    public BusinessException(int code, String message) {
         super(message);
         this.code = code;
         this.errorMessage = message;
@@ -34,7 +35,7 @@ public class BusinessException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
-    public BusinessException(String code, String message, Throwable cause) {
+    public BusinessException(int code, String message, Throwable cause) {
         super(message, cause);
         this.code = code;
         this.errorMessage = message;

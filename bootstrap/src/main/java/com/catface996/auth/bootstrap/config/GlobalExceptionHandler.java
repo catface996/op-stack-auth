@@ -20,7 +20,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.stream.Collectors;
 
 /**
- * Global exception handler for REST controllers
+ * 全局异常处理器
+ * 统一处理 REST 控制器抛出的异常
  */
 @Slf4j
 @RestControllerAdvice
@@ -28,18 +29,18 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthException.class)
     public ResponseEntity<Result<Void>> handleAuthException(AuthException e) {
-        log.warn("Authentication error: {} - {}", e.getErrorCode().getCode(), e.getMessage());
+        log.warn("认证错误: {} - {}", e.getCode(), e.getMessage());
         return ResponseEntity
-                .status(mapToHttpStatus(e.getErrorCode()))
-                .body(Result.failure(e.getErrorCode(), e.getMessage()));
+                .status(mapToHttpStatus(e.getCode()))
+                .body(Result.failure(e.getCode(), e.getMessage()));
     }
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<Result<Void>> handleBusinessException(BusinessException e) {
-        log.warn("Business error: {} - {}", e.getErrorCode().getCode(), e.getMessage());
+        log.warn("业务错误: {} - {}", e.getCode(), e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(Result.failure(e.getErrorCode(), e.getMessage()));
+                .body(Result.failure(e.getCode(), e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -47,10 +48,10 @@ public class GlobalExceptionHandler {
         String message = e.getBindingResult().getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
-        log.warn("Validation error: {}", message);
+        log.warn("参数验证错误: {}", message);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(Result.failure(ErrorCode.VAL_001, message));
+                .body(Result.failure(ErrorCode.INVALID_INPUT, message));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -58,51 +59,56 @@ public class GlobalExceptionHandler {
         String message = e.getConstraintViolations().stream()
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.joining(", "));
-        log.warn("Constraint violation: {}", message);
+        log.warn("约束违反: {}", message);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(Result.failure(ErrorCode.VAL_001, message));
+                .body(Result.failure(ErrorCode.INVALID_INPUT, message));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Result<Void>> handleBadCredentials(BadCredentialsException e) {
-        log.warn("Bad credentials: {}", e.getMessage());
+        log.warn("凭证无效: {}", e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(Result.failure(ErrorCode.AUTH_002, "Invalid credentials"));
+                .body(Result.failure(ErrorCode.INVALID_CREDENTIALS));
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Result<Void>> handleAuthenticationException(AuthenticationException e) {
-        log.warn("Authentication failed: {}", e.getMessage());
+        log.warn("认证失败: {}", e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(Result.failure(ErrorCode.AUTH_001, "Authentication failed"));
+                .body(Result.failure(ErrorCode.AUTHENTICATION_REQUIRED));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Result<Void>> handleAccessDenied(AccessDeniedException e) {
-        log.warn("Access denied: {}", e.getMessage());
+        log.warn("访问拒绝: {}", e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(Result.failure(ErrorCode.AUTH_006, "Access denied"));
+                .body(Result.failure(ErrorCode.ACCESS_DENIED));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Result<Void>> handleGenericException(Exception e) {
-        log.error("Unexpected error", e);
+        log.error("系统异常", e);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Result.failure(ErrorCode.SYS_001, "An unexpected error occurred"));
+                .body(Result.failure(ErrorCode.INTERNAL_ERROR));
     }
 
-    private HttpStatus mapToHttpStatus(ErrorCode errorCode) {
-        return switch (errorCode) {
-            case AUTH_001, AUTH_002, AUTH_003, AUTH_004, AUTH_005 -> HttpStatus.UNAUTHORIZED;
-            case AUTH_006 -> HttpStatus.FORBIDDEN;
-            case AUTH_007, AUTH_008, AUTH_009, AUTH_010 -> HttpStatus.BAD_REQUEST;
-            case VAL_001, VAL_002, VAL_003, VAL_004 -> HttpStatus.BAD_REQUEST;
-            case SYS_001, SYS_002, SYS_003 -> HttpStatus.INTERNAL_SERVER_ERROR;
-        };
+    private HttpStatus mapToHttpStatus(int code) {
+        if (code >= 1001 && code <= 1005) {
+            return HttpStatus.UNAUTHORIZED;
+        } else if (code == 1005) {
+            return HttpStatus.FORBIDDEN;
+        } else if (code >= 1006 && code <= 1010) {
+            return HttpStatus.BAD_REQUEST;
+        } else if (code >= 2001 && code <= 2099) {
+            return HttpStatus.BAD_REQUEST;
+        } else if (code >= 5001 && code <= 5099) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        return HttpStatus.BAD_REQUEST;
     }
 }

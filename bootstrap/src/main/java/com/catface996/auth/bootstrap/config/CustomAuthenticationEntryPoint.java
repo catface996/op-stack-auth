@@ -34,7 +34,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         log.warn("Authentication required for request to {}: {}",
                 request.getRequestURI(), authException.getMessage());
 
-        Result<Void> result = Result.failure(ErrorCode.AUTH_010, "Authentication required");
+        Result<Void> result = Result.failure(ErrorCode.AUTHENTICATION_REQUIRED);
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
