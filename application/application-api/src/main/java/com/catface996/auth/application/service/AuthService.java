@@ -43,4 +43,11 @@ public interface AuthService {
      * @return user info
      */
     UserInfo getCurrentUser(String token);
+
+    /**
+     * Validate token and extract user information (for Gateway authentication)
+     * @param token the access token to validate
+     * @return validation result with user info if valid
+     */
+    com.catface996.auth.application.result.TokenValidationResult validateToken(String token);
 }

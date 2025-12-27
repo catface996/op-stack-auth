@@ -3,6 +3,7 @@ package com.catface996.auth.application.service.impl;
 import com.catface996.auth.application.command.LoginCommand;
 import com.catface996.auth.application.command.RegisterCommand;
 import com.catface996.auth.application.result.AuthResult;
+import com.catface996.auth.application.result.TokenValidationResult;
 import com.catface996.auth.application.result.UserInfo;
 import com.catface996.auth.application.service.AuthService;
 import com.catface996.auth.common.exception.AuthException;
@@ -139,6 +140,41 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(AuthException::invalidToken);
 
         return toUserInfo(user);
+    }
+
+    @Override
+    public TokenValidationResult validateToken(String token) {
+        try {
+            // Check if token is valid
+            if (!tokenProvider.validateToken(token)) {
+                return TokenValidationResult.failure("Invalid token");
+            }
+
+            // Check if token is blacklisted
+            String tokenId = tokenProvider.getTokenId(token);
+            if (tokenBlacklist.isBlacklisted(tokenId)) {
+                return TokenValidationResult.failure("Token has been revoked");
+            }
+
+            // Parse token claims
+            TokenClaims claims = tokenProvider.parseToken(token);
+
+            // Check if token is expired
+            if (claims.isExpired()) {
+                return TokenValidationResult.failure("Token has expired");
+            }
+
+            log.debug("Token validated successfully for user: {}", claims.username());
+
+            return TokenValidationResult.success(
+                    claims.userId(),
+                    claims.username(),
+                    claims.roles()
+            );
+        } catch (Exception e) {
+            log.warn("Token validation failed: {}", e.getMessage());
+            return TokenValidationResult.failure(e.getMessage());
+        }
     }
 
     private UserInfo toUserInfo(User user) {

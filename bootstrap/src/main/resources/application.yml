@@ -1,5 +1,5 @@
 server:
-  port: 9090
+  port: 8084
   servlet:
     context-path: /
 
@@ -64,3 +64,16 @@ management:
   endpoint:
     health:
       show-details: when_authorized
+
+# OpenAPI/Swagger Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+  packages-to-scan: com.catface996.auth.interfaces.http.controller
+  paths-to-match: /api/**

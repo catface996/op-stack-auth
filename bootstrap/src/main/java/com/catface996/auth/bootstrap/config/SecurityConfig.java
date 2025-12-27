@@ -27,12 +27,19 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     private static final String[] PUBLIC_ENDPOINTS = {
-            "/api/v1/auth/register",
-            "/api/v1/auth/login",
-            "/api/v1/auth/refresh",
+            "/api/auth/v1/register",
+            "/api/auth/v1/login",
+            "/api/auth/v1/refresh",
+            "/api/auth/v1/validate",
             "/actuator/health",
             "/actuator/info",
-            "/error"
+            "/error",
+            // Swagger/OpenAPI endpoints
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/webjars/**"
     };
 
     @Bean
@@ -48,7 +55,6 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
