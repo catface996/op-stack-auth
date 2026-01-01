@@ -2,6 +2,10 @@
 
 A DDD (Domain-Driven Design) based authentication and authorization service providing user registration, login, JWT token authentication, and RBAC access control.
 
+## Architecture
+
+![OP-Stack Auth Architecture](doc/images/op-stack-auth-architecture.png)
+
 ## Tech Stack
 
 | Technology | Version | Description |
