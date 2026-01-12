@@ -97,6 +97,14 @@ Follow-up TODOs: None
 | MySQL | 8.0 | 数据库 |
 | SpringDoc | 2.x | API 文档 |
 
+## Environment Configuration
+
+| 环境 | 端口 | 说明 |
+|------|------|------|
+| 开发环境 (local) | 8084 | **禁止修改** |
+
+> ⚠️ **重要**: 开发环境端口 8084 为固定配置，MUST NOT 修改。此端口已与其他服务协调，变更将导致服务间通信失败。
+
 ## Code Style
 
 - Java 代码 MUST 遵循标准 Java 编码规范
